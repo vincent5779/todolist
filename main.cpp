@@ -7,12 +7,12 @@
 
 using namespace std;
 
-const char* hostname = "localhost";
-const char* username = "root";
-const char* password = "nokia3310";
-const char* database = "todolist";
-unsigned int port = 3306;
-const char* unixsocket = NULL;
+const char*hostname="127.0.0.1";
+const char*username="root";
+const char*password="";
+const char*database="todo";
+unsigned int port =3306;
+const char* unixsocket=NULL;
 unsigned long clinentflag = 0;
 string usernamedb, emailbd, passdb;
 MYSQL_ROW row;
@@ -51,7 +51,7 @@ string login(MYSQL* conn) {
                 if (row[1] == passdb && row[2] == usernamedb) {
                     // count=1;
                     cout << "Logined\n";
-                    string user_id = row[3];
+                    string user_id= row[3];
                     return user_id;
                 }
             }
@@ -117,10 +117,6 @@ void createNewAccount(MYSQL* conn) {
 
 }
 
-void tempDis() {
-    
-}
-
 
 int main()
 {
@@ -132,60 +128,97 @@ int main()
         cout << "Invalid Access" << endl;
         return 0;
     }
-    /*
     cout << "Wellcome to todo list: \n member login click 1.\n New user click 0.\n  ";
 
     cin >> number;
     if (number == 1) {
+           
         string user = login(conn);
         //either can use id or username from the input
-        cout << "return user: " << user;
-        //cout<<usernamedb;
+        cout << "return user: " << user<<endl;
+        
+//menu login
+int choseMain;
+while(choseMain!=3){
+        choseMain=0;
+    cout<<"User option:\n\t 1.Create new catalog enter 1.\n";
+    cout<<"\t 2.See catalog enter 2.\n";
+    cout<<"\t 3.logout enter 3.\n";
+    cin>>choseMain;
+    char YorN=NULL;
+
+    switch(choseMain){
+        case 1:
+            while(YorN!='n'){
+                cout<<"Wellcome to create new datalog\n";
+                cout<<"Catalog name: ";
+                string catalogName,listname,dd,mm,yyyy;
+                cin>>catalogName;
+                //cout<<"enter number for day: ";
+                //cin>>dd;
+                //cout<<"month:"; cin>>mm;
+                //cout<<"year:"; cin>>yyyy;
+                //queryReq.newList(user, catalogName, dd, mm, yyyy);
+                queryReq.newList(user,catalogName,"10","10","2020");
+                //add item or create new catalog
+                cout<<"Do you want to add task in: "+catalogName+"\ny/n";
+                string list_no=queryReq.getNewestListNo();
+                cin>>YorN;
+                //or you want to create another catalog
+                while(YorN=='y'){
+                    cout<<"Enter the task: ";
+                    cin>>listname;
+                    queryReq.newItem(list_no,listname);
+                    cout<<"Add more..:y/n";
+                    cin>>YorN;
+                }
+                cout<<"Do you want to add more catalog(y) or go back to main(n) y/n";
+                cin>>YorN;
+            }
+            if(YorN=='n'){
+                break;
+            }
+        case 2:
+            cout<<"There are all the catalog you have...\n";
+            queryReq.getLists();
+            string choseB;
+            cout<<"Which catalog you want to see the task:\n";
+            cout<<"Enter the number of list_no: ";
+            cin>>choseB;
+            queryReq.getItems(choseB);
+            //update or delete task
+            cout<<"Do you want to add more item/update/delete or go back to main(n) y/n\n";
+            cout<<"Just the option No for now";
+            cin>>YorN;
+            if(YorN=='n'){
+                break;
+            }
+        }
+}
+//create catalog
+//see catalog
+
 
     }
     else {
         createNewAccount(conn);
     }
-    */
+
 
     //testing
-    /*
+/*
     queryReq.createCatalog();
-    queryReq.newList("34", "shopping list", 01, 12, 1999);
-    queryReq.newItem("1", "egg");
-    queryReq.newItem("1", "bread");
-    queryReq.newItem("1", "milk");
-    queryReq.newItem("1", "beer");
-    */
-    //test display
-    cout << endl;
-    cout << endl;
-    queryReq.getLists();
-    cout << endl;
-    cout << endl;
-    queryReq.getItems("1");
-    /*
-    string showTemp;
-    showTemp = queryReq.getNewestListNo();
-    cout << showTemp << endl;
-    */
-
-    //queryReq.updateList("walmart","2", 0);
-    /*
+    queryReq.newList("25", "shopping list", "01", "12", "1999");
+    queryReq.newItem("3", "egg1");
+    queryReq.newItem("2", "bread1");
+    queryReq.newItem("2", "milk1");
+    queryReq.newItem("2", "beer1");
+*/
+//queryReq.newList("23", "shopping list", "01", "12", "1999");
     
-    
-    cout << endl;
-    cout << endl;
-    queryReq.getLists();
-    cout << endl;
-    cout << endl;
-    queryReq.getItems("2");
-    */
-
-    cout << "test complete!" << endl;
 
     //Acceesed to the personal todo list
-    /*
+/*
     cout << "enter the target user_id: ";
     cin >> number;
     stringstream sqlString;
@@ -201,7 +234,7 @@ int main()
     else {
         cout << "query failed..." << endl;
     }
-    */
 
+*/
     return 0;
 }
