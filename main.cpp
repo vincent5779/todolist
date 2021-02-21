@@ -51,7 +51,8 @@ string login(MYSQL* conn) {
                 if (row[1] == passdb && row[2] == usernamedb) {
                     // count=1;
                     cout << "Logined\n";
-                    return usernamedb;
+                    string user_id = row[3];
+                    return user_id;
                 }
             }
             if (count == 0) {
@@ -116,6 +117,10 @@ void createNewAccount(MYSQL* conn) {
 
 }
 
+void tempDis() {
+    
+}
+
 
 int main()
 {
@@ -152,12 +157,30 @@ int main()
     queryReq.newItem("1", "milk");
     queryReq.newItem("1", "beer");
     */
+    //test display
+    cout << endl;
+    cout << endl;
     queryReq.getLists();
     cout << endl;
     cout << endl;
     queryReq.getItems("1");
-    queryReq.delList("1");
-    queryReq.getItems("1");
+    /*
+    string showTemp;
+    showTemp = queryReq.getNewestListNo();
+    cout << showTemp << endl;
+    */
+
+    //queryReq.updateList("walmart","2", 0);
+    /*
+    
+    
+    cout << endl;
+    cout << endl;
+    queryReq.getLists();
+    cout << endl;
+    cout << endl;
+    queryReq.getItems("2");
+    */
 
     cout << "test complete!" << endl;
 

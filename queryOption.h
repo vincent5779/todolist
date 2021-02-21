@@ -15,7 +15,7 @@ class queryOption
 	private:
 		string sqlQuery;
 		const char* q = "";
-		const char* currentID = "";
+		string currentID;
 		int qstate = 1;
 		MYSQL* con;
 		MYSQL_ROW row;
@@ -29,16 +29,19 @@ class queryOption
 		}
 		void createCatalog();
 		void createListTable();
-		void newList(string user_id, string list_name, int dd, int mm, int yyyy);
+		void newList(string user_id, string list_name, string dd, string mm, string yyyy);
 		void newItem(string list_no, string item_name);
 		string genListNo();
 		string genItemNo();
-		void accessID(const char* user_id);
+		void accessID(string user_id);
 		string getID();
 		void getLists();
 		void getItems(string listNo);
 		void delItem(string itemNo);
 		void delList(string listNo);
+		void updateItem(string newUpdate, string itemNo);
+		void updateList(string newUpdate, string listNo, int option);
+		string getNewestListNo();
 };
 
 #endif

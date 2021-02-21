@@ -32,9 +32,10 @@ void queryOption::createListTable() {
 		cout << "Users list table failed to create!" << endl;
 }
 
-void queryOption::newList(string user_id, string list_name, int dd, int mm, int yyyy) {
+void queryOption::newList(string user_id, string list_name, string dd, string mm, string yyyy) {
 	string listNo = genListNo();
-	sqlQuery = "INSERT INTO Catalog VALUES(" + user_id + ", " + listNo + ", '" + list_name + "', " + "current_date())";
+	string dateinsert = yyyy + "-" + mm + "-" + dd;
+	sqlQuery = "INSERT INTO Catalog (id, list_no, list_name, time) VALUES(" + user_id + ", " + listNo + ", '" + list_name + "', '" + dateinsert + "')";
 	q = sqlQuery.c_str();
 	qstate = mysql_query(con, q);
 	if (qstate)
@@ -47,7 +48,7 @@ void queryOption::newItem(string list_no, string item_name) {
 	q = sqlQuery.c_str();
 	qstate = mysql_query(con, q);
 	if (qstate)
-		cout << "Query Failed: failed to create new todo list." << endl;
+		cout << "Query Failed: failed to create new item." << endl;
 }
 
 string queryOption::genListNo() {
@@ -55,7 +56,9 @@ string queryOption::genListNo() {
 	int genNo = 0;
 	do {
 		genNo++;
-		numCheck = to_string(genNo);
+		stringstream ss;
+		ss << genNo;
+		ss >> numCheck;
 		sqlQuery = "SELECT list_no FROM Catalog where list_no = " + numCheck;
 		q = sqlQuery.c_str();
 		qstate = mysql_query(con, q);
@@ -72,7 +75,9 @@ string queryOption::genItemNo() {
 	int genNo = 0;
 	do {
 		genNo++;
-		numCheck = to_string(genNo);
+		stringstream ss;
+		ss << genNo;
+		ss >> numCheck;
 		sqlQuery = "SELECT item_no FROM List where item_no = " + numCheck;
 		q = sqlQuery.c_str();
 		qstate = mysql_query(con, q);
@@ -84,7 +89,7 @@ string queryOption::genItemNo() {
 	return numCheck;
 }
 
-void queryOption::accessID(const char* user_id) {
+void queryOption::accessID(string user_id) {
 	currentID = user_id;
 }
 
@@ -119,8 +124,7 @@ void queryOption::getItems(string listNo) {
 	sqlQuery = "SELECT list.list_no, list.item_no, list.item_name, catalog.id "
 		"FROM catalog "
 		"JOIN list "
-		"ON catalog.id = " + getID() + " "
-		"AND catalog.list_no = list.list_no "
+		"ON catalog.list_no = list.list_no "
 		"AND list.list_no = " + listNo;
 	q = sqlQuery.c_str();
 	qstate = mysql_query(con, q);
@@ -148,6 +152,8 @@ void queryOption::delItem(string itemNo) {
 	//error message
 	if (qstate)
 		cout << "Query Failed: failed to delete the item from list" << endl;
+	else
+		cout << "The item_no " + itemNo + "has been deleted" << endl;
 }
 
 void queryOption::delList(string listNo) {
@@ -157,9 +163,7 @@ void queryOption::delList(string listNo) {
 	qstate = mysql_query(con, q);
 	//error message
 	if (qstate)
-		cout << "Query Failed: failed to delete the list" << endl;
-	else
-		cout << "done" << endl;
+		cout << "Query Failed: failed to turn off the safe mode" << endl;
 	//delete the list
 	sqlQuery =	"DELETE list, catalog "
 				"FROM list "
@@ -171,14 +175,61 @@ void queryOption::delList(string listNo) {
 	if (qstate)
 		cout << "Query Failed: failed to delete the list" << endl;
 	else
-		cout << "done" << endl;
+		cout << "The list_no " + listNo + "has been deleted" << endl;
 	//enable safe mode
 	sqlQuery = "SET SQL_SAFE_UPDATES = 1;";
 	q = sqlQuery.c_str();
 	qstate = mysql_query(con, q);
 	//error message
 	if (qstate)
-		cout << "Query Failed: failed to delete the list" << endl;
-	else
-		cout << "done" << endl;
+		cout << "Query Failed: failed to turn on the safe mode" << endl;
+}
+
+void queryOption::updateItem(string newUpdate, string itemNo) {
+	sqlQuery =	"UPDATE list SET item_name = '" + newUpdate + "' WHERE item_no = " + itemNo;
+	q = sqlQuery.c_str();
+	qstate = mysql_query(con, q);
+	//error message
+	if (qstate)
+		cout << "Query Failed: failed to update the item's name" << endl;
+}
+
+void queryOption::updateList(string newUpdate, string listNo, int option) {
+
+	//if 0 = update name, 1 = update time
+	switch (option) {
+		case 0:
+			sqlQuery = "UPDATE catalog SET list_name = '" + newUpdate + "' WHERE list_no = " + listNo;
+			q = sqlQuery.c_str();
+			qstate = mysql_query(con, q);
+			//error message
+			if (qstate)
+				cout << "Query Failed: failed to update the list's name" << endl;
+			break;
+		case 1:
+			sqlQuery = "UPDATE catalog SET time = " + newUpdate + " WHERE list_no = " + listNo;
+			q = sqlQuery.c_str();
+			qstate = mysql_query(con, q);
+			//error message
+			if (qstate)
+				cout << "Query Failed: failed to update the time" << endl;
+			break;
+		default:
+			cout << "No date has been updated" << endl;
+			break;
+	}
+}
+
+string queryOption::getNewestListNo() {
+	string resultTemp = "";
+	sqlQuery = "SELECT list_no FROM catalog WHERE id = " + getID() + " ORDER BY list_no DESC LIMIT 1";
+	q = sqlQuery.c_str();
+	qstate = mysql_query(con, q);
+	//error message
+	if (qstate)
+		cout << "Query Failed: failed to return the newest list_no" << endl;
+	res = mysql_store_result(con);
+	row = mysql_fetch_row(res);
+	resultTemp = row[0];
+	return resultTemp;
 }
