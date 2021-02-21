@@ -25,7 +25,7 @@ class queryOption
 			con = conn;
 			row = NULL;
 			res = NULL;
-			currentID = "34";		//temp need to remove after testing
+			currentID = "";
 		}
 		void createCatalog();
 		void createListTable();
@@ -42,6 +42,8 @@ class queryOption
 		void updateItem(string newUpdate, string itemNo);
 		void updateList(string newUpdate, string listNo, int option);
 		string getNewestListNo();
+		void createUser();
+		int checkIfExist(string location, string option);
 };
 
 #endif

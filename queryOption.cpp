@@ -7,6 +7,19 @@
 #include <iomanip>
 using namespace std;
 
+void queryOption::createUser() {
+	sqlQuery = "CREATE TABLE IF NOT EXISTS users ("
+		"email varchar(50) NOT NULL, password varchar(50) NOT NULL, username VARCHAR(50) NOT NULL, id int(11) NOT NULL AUTO_INCREMENT, "
+		"PRIMARY KEY(id));";
+	q = sqlQuery.c_str();
+	qstate = mysql_query(con, q);
+	if (!qstate)
+		cout << "Users table created!" << endl;
+	else
+		cout << "Users table failed to create!" << endl;
+	createCatalog();
+}
+
 void queryOption::createCatalog() {
 	sqlQuery =	"CREATE TABLE IF NOT EXISTS Catalog ("
 				"id INT NOT NULL, list_no INT NOT NULL, list_name VARCHAR(50) NOT NULL, time DATE NOT NULL,"
@@ -32,6 +45,31 @@ void queryOption::createListTable() {
 		cout << "Users list table failed to create!" << endl;
 }
 
+int queryOption::checkIfExist(string location, string option) {
+	if (location == "checkcatalog") {
+		sqlQuery = "SELECT list_name FROM catalog WHERE id = " + getID() + "";
+	}
+	else {
+		sqlQuery = "SELECT `" + location + "` FROM `users`";
+	}
+	q = sqlQuery.c_str();
+	qstate = mysql_query(con, q);
+	int exist = 0;
+	res = mysql_store_result(con);
+	int count = mysql_num_fields(res);
+	while (row = mysql_fetch_row(res)) {
+		for (int i = 0;i < count;i++) {
+			if (option == row[i]) {
+				exist -= 1;
+				//cout<<exit;
+				return exist;
+			}
+		}
+	}
+	return exist;
+
+}
+
 void queryOption::newList(string user_id, string list_name, string dd, string mm, string yyyy) {
 	string listNo = genListNo();
 	string dateinsert = yyyy + "-" + mm + "-" + dd;
@@ -39,7 +77,7 @@ void queryOption::newList(string user_id, string list_name, string dd, string mm
 	q = sqlQuery.c_str();
 	qstate = mysql_query(con, q);
 	if (qstate)
-		cout << "Query Failed: failed to create new todo list." << endl;
+		cout << "Query Failed: failed to create new newList." << endl;
 }
 
 void queryOption::newItem(string list_no, string item_name) {
