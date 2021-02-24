@@ -20,11 +20,12 @@ string catalogName,listname,dd,mm,yyyy;
 int nutrualN;
 char YorN=NULL;
 string choseCata,update;
-char str [100],stri[200];
+char str [100];
 MYSQL_ROW row;
 MYSQL_RES* res;
-
-
+/*
+This is the function to connect to data
+*/
 MYSQL* connectdatabase() {
     MYSQL* conn;
     conn = mysql_init(0);
@@ -38,47 +39,16 @@ MYSQL* connectdatabase() {
     return conn;
 }
 
-void createNewAccount(MYSQL* conn);
-//login site
-string login(MYSQL* conn) {
-    cout << "LOGIN:\n";
-    int count = 0;
-    while (count == 0) {
-        cout << "Enter username: " << endl;
-        cin >> usernamedb;
-        cout << "Enter password: " << endl;
-        cin >> passdb;
-        int qstate = mysql_query(conn, "SELECT * FROM users");
-        if (!qstate) {
-            res = mysql_store_result(conn);
-            while (row = mysql_fetch_row(res)) {
-                //pass[1] username[2]
-                if (row[1] == passdb && row[2] == usernamedb) {
-                    // count=1;
-                    cout << "Logined\n";
-                    user_id= row[3];
-                    return user_id;
-                }
-            }
-            if (count == 0) {
-                cout << "Wrong username or pass..\n Please try again 1...\n Create a new one 2.";
-                int again;
-                cin>>again;
-                if(again==2){
-                    createNewAccount(conn);
-                }
-            }
-        }
-    }
-}
+/*
+This function to give user to create new account
+*/
 void createNewAccount(MYSQL* conn) {
     queryOption queryReq(conn);
     cout << "Create new account" << endl;
     int qstate = 0;
     stringstream ss;
-    //user input create new account
     int exist = 0;
-    //check if the exist user
+    //check if the user already exist
     do {
         cout << "Enter username: ";
         cin >> usernamedb;
@@ -88,15 +58,16 @@ void createNewAccount(MYSQL* conn) {
     } while (exist < 0);
 
     exist = 0;
+    //check if the email already exist
     do {
-        cout << "Enter email:" << endl;
+        cout << "Enter email: " << endl;
         cin >> emailbd;
         exist=queryReq.checkIfExist("email",emailbd);
         if (exist < 0) {
         cout << "This email already exist. Please Input new one...\n";}
     } while (exist < 0);
 
-    cout << "Enter password:" << endl;
+    cout << "Enter password: " << endl;
     cin >> passdb;
     ss << "INSERT INTO users (username, email, password) VALUES('" + usernamedb + "', '" + emailbd + "', '" + passdb + "')";
     string query = ss.str();
@@ -112,12 +83,48 @@ void createNewAccount(MYSQL* conn) {
     }
 
 }
+/*
+This is the function to login with the return user id as string 
+*/
+string login(MYSQL* conn) {
+    cout << "LOGIN:\n";
+    int count = 0;
+    while (count == 0) {
+        cout << "Enter username: " << endl;
+        cin >> usernamedb;
+        cout << "Enter password: " << endl;
+        cin >> passdb;
+        int qstate = mysql_query(conn, "SELECT * FROM users");
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                if (row[1] == passdb && row[2] == usernamedb) {
+                    cout << "Logined\n";
+                    user_id= row[3];
+                    return user_id;
+                }
+            }
+            //if user input the wrong username or password 
+            if (count == 0) {
+                cout << "Wrong username or pass..\n Please try again 1...\n Create a new one 2.";
+                int again;
+                cin>>again;
+                if(again==2){
+                    createNewAccount(conn);
+                }
+            }
+        }
+    }
+}
 
+/*
+this is the function to display all the task in the user's list-to-do
+*/
 void taskMenu(MYSQL* conn,string user, string list_no){
     queryOption queryReq(conn);
     queryReq.accessID(user);
 
-    int choice;
+    int choice=0;
 
     while(choice!=4){
         choice=0;
@@ -125,8 +132,8 @@ void taskMenu(MYSQL* conn,string user, string list_no){
         cin>>choice;
         switch(choice){
             case 1:
+            //to create more task in the list
                 YorN='y';
-                //or you want to create another catalog
                 while(YorN=='y'){
                     cout<<"Enter the task: ";
                     scanf(" %[^\n]s",str);
@@ -138,6 +145,7 @@ void taskMenu(MYSQL* conn,string user, string list_no){
                 }
                 break;
             case 2:
+            //to update the specific item_no
                 cout<<"Which task you want to update: ";
                 cin>>choseCata;
                 cout<<"Change to: ";
@@ -148,15 +156,20 @@ void taskMenu(MYSQL* conn,string user, string list_no){
                 queryReq.updateItem(update, choseCata);
                 break;
             case 3:
+            //to delete the specific item_no
                 cout<<"Which task you want to delete: ";
                 cin>>choseCata;
                 queryReq.delItem(choseCata);
                 break;
             case 4:
+            //to exit the while loop
                 break;
             }
     }
 }
+/*
+this is the function to display the all the option for list-to-do user has.
+*/
 void personalMenu(MYSQL* conn, string user){
     queryOption queryReq(conn);
     queryReq.accessID(user);
@@ -171,11 +184,11 @@ void personalMenu(MYSQL* conn, string user){
         cin>>choice;
         switch(choice){
             case 1:
-                //1. Display all the tasks in catalog
+            //1. Display all the tasks in catalog
                 cout<<"Enter the list_no want to display:\n";
                 cin>>choseCata;
                 queryReq.getItems(choseCata);
-                //taskMenu
+                //go to taskmenu function
                 cout<<"what do you want with those list: \n";
                 taskMenu(conn,user,choseCata);
 
@@ -212,6 +225,9 @@ void personalMenu(MYSQL* conn, string user){
     }
     }
 }
+/*
+The function is display the user option
+*/
 void catalogMenu(MYSQL* conn, string user){
     queryOption queryReq(conn);
     queryReq.accessID(user);
@@ -225,11 +241,13 @@ void catalogMenu(MYSQL* conn, string user){
         cin>>nutrualN;
         switch(nutrualN){
             case 1:
+            // user able to create new to-do-list.
                 YorN=' ';
                 while(YorN!='n'){
                     cout<<"Wellcome to create new datalog\n";
                     string catalogName,listname,dd,mm,yyyy;
                     int exist = 0;
+                    //to check if the catalog name already exist.
                     do {
                         cout<<"Catalog name: ";
                         scanf(" %[^\n]s",str);
@@ -271,6 +289,7 @@ void catalogMenu(MYSQL* conn, string user){
                 personalMenu(conn,user);
                 break;
             case 3:
+                //exit the while loop go back
                 break;
             }
         }
@@ -287,28 +306,30 @@ int main()
         cout << "Invalid Access" << endl;
         return 0;
     }
-
+    //create database for user to use
     queryReq.createUser();
-
+    //main menu
     while(number!=3){
         number=0;
-        cout << "Wellcome to todo list: \n member login click 1.\n New user click 0.\n  ";
+        cout << "Wellcome to todo list: \n member login click 1.\n New user click 2.\n Exit click 3.  ";
         cin >> number;
         switch(number){
             case 1:
+                //user login
                 user_id = login(conn);
-                //either can use id or username from the input
                 cout << "return user: " << user_id<<endl;
                 queryReq.accessID(user_id);
                 //menu login
                 catalogMenu(conn,user_id);
                 break;
             case 2:
+                //create new user
                 createNewAccount(conn);
                 break;
             case 3:
-            cout<<"You exit the program!!\n";
-             return 0;
+                //exit the propram
+                cout<<"You exit the program!!\n";
+                return 0;
         }
     }
 }

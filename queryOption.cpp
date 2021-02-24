@@ -64,7 +64,7 @@ void queryOption::createListTable() {
 }
 
 /**
-* check if the user exist
+* check if the user, email, or catalog name exist
 * @param location 
 * @param option
 * @return exist
