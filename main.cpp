@@ -10,7 +10,7 @@ using namespace std;
 
 const char*hostname="127.0.0.1";
 const char*username="root";
-const char*password="";
+const char*password="123456";
 const char*database="todo";
 unsigned int port =3306;
 const char* unixsocket=NULL;
@@ -37,6 +37,17 @@ MYSQL* connectdatabase() {
         cout << "Database Connection Fail!" << endl;
     }
     return conn;
+}
+
+/*
+to get the string input as whole line
+*/
+string input ()
+{
+    string messageVar;
+    cin.ignore();
+    getline(cin, messageVar);
+    return messageVar;
 }
 
 /*
@@ -84,7 +95,7 @@ void createNewAccount(MYSQL* conn) {
 
 }
 /*
-This is the function to login with the return user id as string 
+This is the function to login with the return user id as string
 */
 string login(MYSQL* conn) {
     cout << "LOGIN:\n";
@@ -104,7 +115,7 @@ string login(MYSQL* conn) {
                     return user_id;
                 }
             }
-            //if user input the wrong username or password 
+            //if user input the wrong username or password
             if (count == 0) {
                 cout << "Wrong username or pass..\n Please try again 1...\n Create a new one 2.";
                 int again;
@@ -136,9 +147,7 @@ void taskMenu(MYSQL* conn,string user, string list_no){
                 YorN='y';
                 while(YorN=='y'){
                     cout<<"Enter the task: ";
-                    scanf(" %[^\n]s",str);
-                    string ToS(str);
-                    listname=ToS;
+                    listname=input();
                     queryReq.newItem(list_no,listname);
                     cout<<"Add more..: y/n";
                     cin>>YorN;
@@ -149,10 +158,7 @@ void taskMenu(MYSQL* conn,string user, string list_no){
                 cout<<"Which task you want to update: ";
                 cin>>choseCata;
                 cout<<"Change to: ";
-                //scanf(" %[^\n]s",stri);
-                //string ToS(stri);
-                //update=ToS;
-                cin>>update;
+                update=input ();
                 queryReq.updateItem(update, choseCata);
                 break;
             case 3:
@@ -203,10 +209,7 @@ void personalMenu(MYSQL* conn, string user){
                     int option;
                     cin>>option;
                 cout<<"Change to: ";
-                //scanf(" %[^\n]s",str);
-                //string ToS(str);
-                //update=ToS;
-                cin>>update;
+                update=input();
                 queryReq.updateList(update, choseCata,option);
                 cout<<"Go back to CatalogMenu(y)\n or Log out(n) y/n: ";
                 cin>>YorN;
@@ -250,10 +253,10 @@ void catalogMenu(MYSQL* conn, string user){
                     //to check if the catalog name already exist.
                     do {
                         cout<<"Catalog name: ";
-                        scanf(" %[^\n]s",str);
-                        string CToS(str);
-                        catalogName=CToS;
-                        exist=queryReq.checkIfExist("checkcatalog",catalogName);
+                        catalogName=input();
+                        if(catalogName!=""){
+                            exist=queryReq.checkIfExist("checkcatalog",catalogName);
+                        }
                         if (exist < 0) {
                         cout << "This catalog already exist. Please Input new one...\n";}
                     } while (exist < 0);
@@ -270,9 +273,7 @@ void catalogMenu(MYSQL* conn, string user){
                     //or you want to create another catalog
                     while(YorN=='y'){
                         cout<<"Enter the task: ";
-                        scanf(" %[^\n]s",str);
-                        string ToS(str);
-                        listname=ToS;
+                        listname=input();
                         queryReq.newItem(list_no,listname);
                         cout<<"Add more..: y/n";
                         cin>>YorN;
@@ -333,3 +334,4 @@ int main()
         }
     }
 }
+
