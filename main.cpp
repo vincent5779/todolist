@@ -8,19 +8,18 @@
 
 using namespace std;
 
-const char*hostname="127.0.0.1";
-const char*username="root";
-const char*password="123456";
-const char*database="todo";
-unsigned int port =3306;
-const char* unixsocket=NULL;
+const char* hostname = "127.0.0.1";
+const char* username = "root";
+const char* password = "123456";
+const char* database = "todo";
+unsigned int port = 3306;
+const char* unixsocket = NULL;
 unsigned long clinentflag = 0;
-string usernamedb, emailbd, passdb,user_id;
-string catalogName,listname,dd,mm,yyyy;
+string usernamedb, emailbd, passdb, user_id;
+string catalogName, listname, dd, mm, yyyy;
 int nutrualN;
-char YorN=NULL;
-string choseCata,update;
-char str [100];
+char YorN = NULL;
+string choseCata, update;
 MYSQL_ROW row;
 MYSQL_RES* res;
 /*
@@ -31,7 +30,7 @@ MYSQL* connectdatabase() {
     conn = mysql_init(0);
     conn = mysql_real_connect(conn, hostname, username, password, database, port, unixsocket, clinentflag);
     if (conn) {
-        cout << "Database Connected!"<< endl;
+        cout << "Database Connected!" << endl;
     }
     else {
         cout << "Database Connection Fail!" << endl;
@@ -42,7 +41,7 @@ MYSQL* connectdatabase() {
 /*
 to get the string input as whole line
 */
-string input ()
+string input()
 {
     string messageVar;
     cin.ignore();
@@ -63,9 +62,10 @@ void createNewAccount(MYSQL* conn) {
     do {
         cout << "Enter username: ";
         cin >> usernamedb;
-        exist=queryReq.checkIfExist("username",usernamedb);
+        exist = queryReq.checkIfExist("username", usernamedb);
         if (exist < 0) {
-        cout << "This user already exist. Please Input new one...\n";}
+            cout << "This user already exist. Please Input new one...\n";
+        }
     } while (exist < 0);
 
     exist = 0;
@@ -73,9 +73,10 @@ void createNewAccount(MYSQL* conn) {
     do {
         cout << "Enter email: " << endl;
         cin >> emailbd;
-        exist=queryReq.checkIfExist("email",emailbd);
+        exist = queryReq.checkIfExist("email", emailbd);
         if (exist < 0) {
-        cout << "This email already exist. Please Input new one...\n";}
+            cout << "This email already exist. Please Input new one...\n";
+        }
     } while (exist < 0);
 
     cout << "Enter password: " << endl;
@@ -111,7 +112,7 @@ string login(MYSQL* conn) {
             while (row = mysql_fetch_row(res)) {
                 if (row[1] == passdb && row[2] == usernamedb) {
                     cout << "Logined\n";
-                    user_id= row[3];
+                    user_id = row[3];
                     return user_id;
                 }
             }
@@ -119,182 +120,185 @@ string login(MYSQL* conn) {
             if (count == 0) {
                 cout << "Wrong username or pass..\n Please try again 1...\n Create a new one 2.";
                 int again;
-                cin>>again;
-                if(again==2){
+                cin >> again;
+                if (again == 2) {
                     createNewAccount(conn);
                 }
             }
         }
     }
+    return "";
 }
 
 /*
 this is the function to display all the task in the user's list-to-do
 */
-void taskMenu(MYSQL* conn,string user, string list_no){
+void taskMenu(MYSQL* conn, string user, string list_no) {
     queryOption queryReq(conn);
     queryReq.accessID(user);
 
-    int choice=0;
+    int choice = 0;
 
-    while(choice!=4){
-        choice=0;
-        cout<<"1.ADD more task\n2.Update task\n3.Delete task\n4. Go back.\n";
-        cin>>choice;
-        switch(choice){
-            case 1:
+    while (choice != 4) {
+        choice = 0;
+        cout << "1.ADD more task\n2.Update task\n3.Delete task\n4. Go back.\n";
+        cin >> choice;
+        switch (choice) {
+        case 1:
             //to create more task in the list
-                YorN='y';
-                while(YorN=='y'){
-                    cout<<"Enter the task: ";
-                    listname=input();
-                    queryReq.newItem(list_no,listname);
-                    cout<<"Add more..: y/n";
-                    cin>>YorN;
-                }
-                break;
-            case 2:
-            //to update the specific item_no
-                cout<<"Which task you want to update: ";
-                cin>>choseCata;
-                cout<<"Change to: ";
-                update=input ();
-                queryReq.updateItem(update, choseCata);
-                break;
-            case 3:
-            //to delete the specific item_no
-                cout<<"Which task you want to delete: ";
-                cin>>choseCata;
-                queryReq.delItem(choseCata);
-                break;
-            case 4:
-            //to exit the while loop
-                break;
+            YorN = 'y';
+            while (YorN == 'y') {
+                cout << "Enter the task: ";
+                listname = input();
+                queryReq.newItem(list_no, listname);
+                cout << "Add more..: y/n";
+                cin >> YorN;
             }
+            break;
+        case 2:
+            //to update the specific item_no
+            cout << "Which task you want to update: ";
+            cin >> choseCata;
+            cout << "Change to: ";
+            update = input();
+            queryReq.updateItem(update, choseCata);
+            break;
+        case 3:
+            //to delete the specific item_no
+            cout << "Which task you want to delete: ";
+            cin >> choseCata;
+            queryReq.delItem(choseCata);
+            break;
+        case 4:
+            //to exit the while loop
+            break;
+        }
     }
 }
 /*
 this is the function to display the all the option for list-to-do user has.
 */
-void personalMenu(MYSQL* conn, string user){
+void personalMenu(MYSQL* conn, string user) {
     queryOption queryReq(conn);
     queryReq.accessID(user);
     queryReq.getLists();
-    int choice=0;
-    while(choice!=4){
-        cout<<"what do you want with the catalog: \n";
-        cout<<"1. Display all the tasks in a the list.\n";
-        cout<<"2. Change an existing task name in this list.\n";
-        cout<<"3. Delete an existing task in this list.\n";
-        cout<<"4. Back to previous menu.\n";
-        cin>>choice;
-        switch(choice){
-            case 1:
+    int choice = 0;
+    while (choice != 4) {
+        cout << "what do you want with the catalog: \n";
+        cout << "1. Display all the tasks in a the list.\n";
+        cout << "2. Change an existing task name in this list.\n";
+        cout << "3. Delete an existing task in this list.\n";
+        cout << "4. Back to previous menu.\n";
+        cin >> choice;
+        switch (choice) {
+        case 1:
             //1. Display all the tasks in catalog
-                cout<<"Enter the list_no want to display:\n";
-                cin>>choseCata;
-                queryReq.getItems(choseCata);
-                //go to taskmenu function
-                cout<<"what do you want with those list: \n";
-                taskMenu(conn,user,choseCata);
+            cout << "Enter the list_no want to display:\n";
+            cin >> choseCata;
+            queryReq.getItems(choseCata);
+            //go to taskmenu function
+            cout << "what do you want with those list: \n";
+            taskMenu(conn, user, choseCata);
 
+            break;
+        case 2:
+            //2. Change an existing catalog name
+            //cout<<"Change an existing catalog name";
+            cout << "Enter the list_on to update it\n";
+            cin >> choseCata;
+            cout << "Change name of list 0.\n";
+            cout << "Change date of list 1.\n";
+            int option;
+            cin >> option;
+            cout << "Change to: ";
+            update = input();
+            queryReq.updateList(update, choseCata, option);
+            cout << "Go back to CatalogMenu(y)\n or Log out(n) y/n: ";
+            cin >> YorN;
+            if (YorN == 'y') { break; }
+            else {
+                //cout<<"You log out!!!";
+                nutrualN = 5;
                 break;
-            case 2:
-                //2. Change an existing catalog name
-                //cout<<"Change an existing catalog name";
-                cout<<"Enter the list_on to update it\n";
-                cin>>choseCata;
-                cout<<"Change name of list 0.\n";
-                cout<<"Change date of list 1.\n";
-                    int option;
-                    cin>>option;
-                cout<<"Change to: ";
-                update=input();
-                queryReq.updateList(update, choseCata,option);
-                cout<<"Go back to CatalogMenu(y)\n or Log out(n) y/n: ";
-                cin>>YorN;
-                if(YorN=='y'){break;}
-                else{
-                    //cout<<"You log out!!!";
-                    nutrualN=5;
-                    break;}
-            case 3:
-                //3. Delete an existing catalog
-                cout<<"Enter the list_on to delete: ";
-                cin>>choseCata;
-                queryReq.delList(choseCata);
-                break;
+            }
+        case 3:
+            //3. Delete an existing catalog
+            cout << "Enter the list_on to delete: ";
+            cin >> choseCata;
+            queryReq.delList(choseCata);
+            break;
 
-    }
+        }
     }
 }
 /*
 The function is display the user option
 */
-void catalogMenu(MYSQL* conn, string user){
+void catalogMenu(MYSQL* conn, string user) {
     queryOption queryReq(conn);
     queryReq.accessID(user);
-    nutrualN=0;
-    while(nutrualN!=3){
+    nutrualN = 0;
+    while (nutrualN != 3) {
 
-        cout<<"User CatalogMenu:\n\t 1. Create new to-do list.\n";
-        cout<<"\t 2. Display all personal to-do list.\n";
-        cout<<"\t 3. Go back to loginMenu.\n";
+        cout << "User CatalogMenu:\n\t 1. Create new to-do list.\n";
+        cout << "\t 2. Display all personal to-do list.\n";
+        cout << "\t 3. Go back to loginMenu.\n";
 
-        cin>>nutrualN;
-        switch(nutrualN){
-            case 1:
+        cin >> nutrualN;
+        switch (nutrualN) {
+        case 1:
             // user able to create new to-do-list.
-                YorN=' ';
-                while(YorN!='n'){
-                    cout<<"Wellcome to create new datalog\n";
-                    string catalogName,listname,dd,mm,yyyy;
-                    int exist = 0;
-                    //to check if the catalog name already exist.
-                    do {
-                        cout<<"Catalog name: ";
-                        catalogName=input();
-                        if(catalogName!=""){
-                            exist=queryReq.checkIfExist("checkcatalog",catalogName);
-                        }
-                        if (exist < 0) {
-                        cout << "This catalog already exist. Please Input new one...\n";}
-                    } while (exist < 0);
-                    //cout<<"enter number for day: ";
-                    //cin>>dd;
-                    //cout<<"month:"; cin>>mm;
-                    //cout<<"year:"; cin>>yyyy;
-                    //queryReq.newList(user, catalogName, dd, mm, yyyy);
-                    queryReq.newList(user,catalogName,"10","10","2020");
-                    //add item or create new catalog
-                    cout<<"Do you want to add task in: "+catalogName+"\n y/n: ";
-                    string list_no=queryReq.getNewestListNo();
-                    cin>>YorN;
-                    //or you want to create another catalog
-                    while(YorN=='y'){
-                        cout<<"Enter the task: ";
-                        listname=input();
-                        queryReq.newItem(list_no,listname);
-                        cout<<"Add more..: y/n";
-                        cin>>YorN;
+            YorN = ' ';
+            while (YorN != 'n') {
+                cout << "Wellcome to create new datalog\n";
+                string catalogName, listname, dd, mm, yyyy;
+                int exist = 0;
+                //to check if the catalog name already exist.
+                do {
+                    cout << "Catalog name: ";
+                    catalogName = input();
+                    if (catalogName != "") {
+                        exist = queryReq.checkIfExist("checkcatalog", catalogName);
                     }
-                    cout<<"Do you want to add more catalog(y) or go back to main(n) y/n :";
-                    cin>>YorN;
+                    if (exist < 0) {
+                        cout << "This catalog already exist. Please Input new one...\n";
+                    }
+                } while (exist < 0);
+                //cout<<"enter number for day: ";
+                //cin>>dd;
+                //cout<<"month:"; cin>>mm;
+                //cout<<"year:"; cin>>yyyy;
+                //queryReq.newList(user, catalogName, dd, mm, yyyy);
+                queryReq.newList(user, catalogName, "10", "10", "2020");
+                //add item or create new catalog
+                cout << "Do you want to add task in: " + catalogName + "\n y/n: ";
+                string list_no = queryReq.getNewestListNo();
+                cin >> YorN;
+                //or you want to create another catalog
+                while (YorN == 'y') {
+                    cout << "Enter the task: ";
+                    listname = input();
+                    queryReq.newItem(list_no, listname);
+                    cout << "Add more..: y/n";
+                    cin >> YorN;
                 }
-                /*if(YorN=='n'){
-                    break;
-                }*/
-                break;
-            case 2:
-                cout<<"There are all the catalogs you have...\n";
-                personalMenu(conn,user);
-                break;
-            case 3:
-                //exit the while loop go back
-                break;
+                cout << "Do you want to add more catalog(y) or go back to main(n) y/n :";
+                cin >> YorN;
             }
+            /*if(YorN=='n'){
+                break;
+            }*/
+            break;
+        case 2:
+            cout << "There are all the catalogs you have...\n";
+            personalMenu(conn, user);
+            break;
+        case 3:
+            //exit the while loop go back
+            break;
         }
-    cout<<"You have been log out.\n";
+    }
+    cout << "You have been log out.\n";
 }
 
 int main()
@@ -302,7 +306,7 @@ int main()
     //connect database
     MYSQL* conn = connectdatabase();
     queryOption queryReq(conn);
-    int number;
+    int number = 0;
     if (!conn) {
         cout << "Invalid Access" << endl;
         return 0;
@@ -310,28 +314,27 @@ int main()
     //create database for user to use
     queryReq.createUser();
     //main menu
-    while(number!=3){
-        number=0;
+    while (number != 3) {
+        number = 0;
         cout << "Wellcome to todo list: \n member login click 1.\n New user click 2.\n Exit click 3.  ";
         cin >> number;
-        switch(number){
-            case 1:
-                //user login
-                user_id = login(conn);
-                cout << "return user: " << user_id<<endl;
-                queryReq.accessID(user_id);
-                //menu login
-                catalogMenu(conn,user_id);
-                break;
-            case 2:
-                //create new user
-                createNewAccount(conn);
-                break;
-            case 3:
-                //exit the propram
-                cout<<"You exit the program!!\n";
-                return 0;
+        switch (number) {
+        case 1:
+            //user login
+            user_id = login(conn);
+            cout << "return user: " << user_id << endl;
+            queryReq.accessID(user_id);
+            //menu login
+            catalogMenu(conn, user_id);
+            break;
+        case 2:
+            //create new user
+            createNewAccount(conn);
+            break;
+        case 3:
+            //exit the propram
+            cout << "You exit the program!!\n";
+            return 0;
         }
     }
 }
-
