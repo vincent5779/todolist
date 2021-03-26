@@ -3,6 +3,8 @@
 #include<QMessageBox>
 #include <QInputDialog>
 #include <QDebug>
+#include "thirdmain.h"
+#include "mainwindow.h"
 
 secondMain::secondMain(QWidget *parent) :
     QDialog(parent),
@@ -34,14 +36,23 @@ void secondMain::on_pushButton_clicked()
 
 void secondMain::on_pushButton_2_clicked()
 {
-        QMessageBox::information(this, "Show the data", "There are all the data");
+    QMessageBox::information(this, "Show the data", "There are all the data");
+    hide();
+//    Tasklist = new tasklist(this);
+//    Tasklist->show();
+    thirdmain thirdmain;
+    thirdmain.setModal(true);
+    thirdmain.exec();
 
 }
 
 
 void secondMain::on_pushButton_3_clicked()
 {
-    close();
+    this->hide();
+    MainWindow *newmain= new MainWindow();
+    newmain->show();
+//    parentMainWindow.show();
 }
 
 

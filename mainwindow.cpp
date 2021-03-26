@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -82,22 +83,30 @@ void MainWindow::on_pushButton_clicked()
           ui->label->setText("NOT connected:");
      }
      QSqlQuery query(db);
+     bool userlogined=false;
+     QString q="SELECT * FROM users WHERE users username = "+username;
+     qDebug()<<q;
     query.exec("SELECT * FROM users");
     while (query.next()) {
             QString usernamedb = query.value(2).toString();
             QString passdb = query.value(1).toString();
             if(username==usernamedb && password==passdb){
                 QMessageBox::information(this, "Login", "You are login!!");
+                userlogined=true;
                 close();
                 QString Iduser= query.value(3).toString();
+                secondMain secondMain;
+                secondMain.setModal(true);
+                secondMain.exec();
+                break;
+            }
 
-                secondmain = new secondMain(this);
-                secondmain->show();
-            }
-            else{
-                QMessageBox::warning(this,"Login","Username or password is not correct");
-            }
 
         }
+    if(userlogined==false){
+        QMessageBox::warning(this,"Login","Username or password is not correct");
+
+    }
+
 
 }

@@ -2,6 +2,7 @@
 #define SECONDMAIN_H
 
 #include <QDialog>
+#include "thirdmain.h"
 
 namespace Ui {
 class secondMain;
@@ -31,7 +32,7 @@ private slots:
 private:
     Ui::secondMain *ui;
 
-
+//    tasklist *Tasklist;
 };
 
 #endif // SECONDMAIN_H

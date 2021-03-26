@@ -11,15 +11,20 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    secondmain.cpp
+    queryoption.cpp \
+    secondmain.cpp \
+    thirdmain.cpp
 
 HEADERS += \
     mainwindow.h \
-    secondmain.h
+    queryoption.h \
+    secondmain.h \
+    thirdmain.h
 
 FORMS += \
     mainwindow.ui \
-    secondmain.ui
+    secondmain.ui \
+    thirdmain.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
